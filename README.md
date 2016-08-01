@@ -1,2 +1,2 @@
 # TinderBot
-Scala Tinder Both
+Scala Tinder Bot
