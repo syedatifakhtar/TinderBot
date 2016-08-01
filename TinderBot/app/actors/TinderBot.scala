@@ -3,6 +3,7 @@ package actors
 import actors.TinderBot._
 import akka.actor.Actor
 import com.typesafe.config.Config
+import play.api.libs.json.Json
 import play.api.{Configuration, Play}
 import play.api.libs.ws.WSClient
 
@@ -22,22 +23,35 @@ class TinderBot(wSClient: WSClient, configs: Config) extends Actor{
 
   val tinderAuthHeaders = Map(
     "User-Agent"      -> configs.as[String]("tinderBot.userAgent"),
+    "platform"        -> configs.as[String]("tinderBot.platform"),
     "app-version"     -> configs.as[String]("tinderBot.appVersion"),
-    "os-version"      -> "23",
+    "os-version"      -> configs.as[String]("tinderBot.osVersion"),
     "Facebook-ID"     -> configs.as[String]("tinderBot.userFacebookId"),
+    "host"            -> configs.as[String]("tinderBot.authHost"),
     "Accept-Language" -> "en",
     "Content-Type"    -> "application/json; charset=utf-8",
     "Connection"      -> "Keep-Alive",
     "Accept-Encoding" -> "gzip"
   ).toArray
 
-  val jsonData = s"{\"facebook_id\": \"${configs.as[String]("tinderBot.userFacebookId")}\"" +
-    s",\"facebook_token\": \"${configs.as[String]("tinderBot.userFacebookToken")}\"}"
+  val userFacebookId    = configs.as[String]("tinderBot.userFacebookId")
+  val userFacebookToken = configs.as[String]("tinderBot.userFacebookToken")
+
+  case class authData(facebook_id: String,facebook_token: String)
+
+  object authData{
+    implicit val authDataReads = Json.writes[authData]
+  }
+
+  val jsonData = Json.toJson(authData(userFacebookId,userFacebookToken))
 
 
   def initialized: Receive = {
     case Start =>
       println("Firing AUTH request")
+      tinderAuthHeaders.map(x=>println(x.toString))
+
+      println(s"\n\n\n----------Json Data---------------\n${jsonData}")
       wSClient
         .url("https://api.gotinder.com/auth")
         .withHeaders(tinderAuthHeaders: _*)
