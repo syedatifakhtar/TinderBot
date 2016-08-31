@@ -23,8 +23,7 @@ class BotSupervisor(wsClient: WSClient,config: Config) extends Actor with ActorL
 
   override def preStart() = {
     log.info("Starting Tinder Bot Supervisor")
-    println("Actor Starting now!!!!")
-    tinderBot ! TinderBot.Start
+        tinderBot ! TinderBot.Start
   }
 
 

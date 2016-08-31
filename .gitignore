@@ -1,5 +1,7 @@
 *.class
 *.log
+activator
+*.jar
 
 # sbt specific
 .cache
@@ -12,6 +14,13 @@ src_managed/
 project/boot/
 project/plugins/project/
 
+
+#Scala Conf
+conf/application.conf
+
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+.java-version
+
+
